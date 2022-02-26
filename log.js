@@ -50,12 +50,12 @@ const LOGS = {
  * @param damage
  * @returns {string}
  */
-const collectLog = (logText, player, damage) => {
+const collectLog = (logText, {name,hp}, damage) => {
     let log;
     if (damage) {
-        log = `${date} ${logText} -${damage}HP ${player.name} ${player.hp}/100HP`;
+        log = `${date} ${logText} -${damage}HP ${name} ${hp}/100HP`;
     } else {
-        log = `${date} ${logText} ${player.name} ${player.hp}/100HP`;
+        log = `${date} ${logText} ${name} ${hp}/100HP`;
     }
     return log;
 }
@@ -94,7 +94,8 @@ export const generateLog = (type, play1, play2, damage) => {
             log = LOGS.end[getRandom(3) - 1].replace('[playerWins]', play1.name).replace('[playerLose]', play2.name);
             break;
         case 'draw':
-            addLog(LOGS.draw);
+            log = LOGS.draw;
+            break
     }
     addLog(log);
     $chat.scrollTop = $chat.scrollHeight;

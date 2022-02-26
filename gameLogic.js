@@ -1,7 +1,9 @@
 import {createElement} from "./util.js";
 import {generateLog} from "./log.js";
-import {$arena} from "./main.js";
+import {enemyAttack, Player, playerAttack} from "./player.js";
 const $randomButton = document.querySelector('.button');
+const $arena = document.querySelector('.arenas');
+export const $formFight = document.querySelector('.control');
 
 /**
  * Создаем кнопку Restart для перезапуска игры после её окончания
@@ -56,3 +58,61 @@ export const showResult = (player1,player2) => {
     }
 }
 
+
+export class Game{
+
+    gameStart(){
+        const player1= new Player({
+            player: 1,
+            name: 'Sonya',
+            hp: 100,
+            img: 'http://reactmarathon-api.herokuapp.com/assets/sonya.gif',
+            weapon: ['axe', 'knife'],
+            rootSelector:'arenas'
+        });
+        const player2=new Player({
+            player: 2,
+            name: 'Scorpion',
+            hp: 100,
+            img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
+            weapon: ['axe', 'knife'],
+            rootSelector:'arenas'
+        })
+        player1.attack();
+        player2.attack();
+        generateLog('start',player1,player2);
+
+        player1.createPlayer();
+        player2.createPlayer();
+
+
+        /**
+         * Добавляем listener на кнопку submit для игры
+         */
+        $formFight.addEventListener('submit', function (e) {
+
+            e.preventDefault();
+            console.dir($formFight);
+            const enemy = enemyAttack();
+            const attack = playerAttack();
+
+
+            if (enemy.hit != attack.defence) {
+                player1.changeHP(enemy.value);
+                player1.renderHP(player1.elHP());
+                generateLog('hit', player2, player1, enemy.value);
+            } else {
+                generateLog('defence', player2, player1);
+            }
+            if (attack.hit != enemy.defence) {
+                player2.changeHP(attack.value);
+                player2.renderHP(player2.elHP());
+                generateLog('hit', player1, player2, attack.value);
+            } else {
+                generateLog('defence', player1, player2)
+            }
+            showResult(player1,player2);
+        })
+}
+
+}
