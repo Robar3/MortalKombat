@@ -72,44 +72,38 @@ export class Player{
     }
 }
 
-
-
-const HIT = {
-    head: 30,
-    body: 25,
-    foot: 20,
-}
-const ATTACK = ['head', 'body', 'foot'];
-
 /**
- * Атака компьютера
- * @returns {{hit: string, defence: string, value: number}}
+ * Передаем в апи выбранные места удара, и полчаем сколько урона и куда нанесли мы и враг
+ * @returns {Promise<Response>}
  */
-export function enemyAttack() {
-    const hit = ATTACK[getRandom(3) - 1];
-    const defence = ATTACK[getRandom(3) - 1];
-    return {
-        value: getRandom(HIT[hit]),
-        hit,
-        defence
-    }
-}
-
-/**
- * Атака игрока
- * @returns {{}}
- */
-export const playerAttack = () => {
-    const attack = {};
+export async function pve(){
+    let hit ;
+    let defence;
     for (let item of $formFight) {
         if (item.checked && item.name == 'hit') {
-            attack.value = getRandom(HIT[item.value]);
-            attack.hit = item.value;
+            hit =item.value;
         }
         if (item.checked && item.name == 'defence') {
-            attack.defence = item.value;
+            defence = item.value;
         }
         item.checked = false;
     }
-    return attack;
+   const fightResult= await fetch('http://reactmarathon-api.herokuapp.com/api/mk/player/fight', {
+        method: 'POST',
+        body: JSON.stringify({
+            hit,
+            defence,
+        })
+    }).then( function (response){
+       if (!response.ok) {
+           return Promise.reject(new Error(
+               'Response failed: ' + response.status + ' (' + response.statusText + ')'
+           ));
+       }else {
+               const fightRes = response.json();
+           return fightRes;
+       }
+   });
+return fightResult;
 }
+

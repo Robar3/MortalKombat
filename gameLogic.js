@@ -1,6 +1,6 @@
 import {createElement} from "./util.js";
 import {generateLog} from "./log.js";
-import {enemyAttack, Player, playerAttack} from "./player.js";
+import { Player,pve} from "./player.js";
 const $randomButton = document.querySelector('.button');
 const $arena = document.querySelector('.arenas');
 export const $formFight = document.querySelector('.control');
@@ -12,11 +12,11 @@ export const $formFight = document.querySelector('.control');
 const createReloadButton = () => {
     const $reloadWrap = createElement('div', 'reloadWrap');
     const $buttonRestart = createElement('button', 'button');
-    $buttonRestart.innerText = 'Restart';
+    $buttonRestart.innerText = 'Change hero';
     $reloadWrap.appendChild($buttonRestart);
 
     $buttonRestart.addEventListener('click', function () {
-        window.location.reload();
+        window.location.replace('./changeHero/index.html');
     })
 
     return $reloadWrap;
@@ -61,20 +61,22 @@ export const showResult = (player1,player2) => {
 
 export class Game{
 
-    gameStart(){
+     gameStart(){
+        const player1JSO=JSON.parse(localStorage.getItem('player1'));
+        const enemyJSON=JSON.parse(localStorage.getItem('enemy'));
         const player1= new Player({
             player: 1,
-            name: 'Sonya',
-            hp: 100,
-            img: 'http://reactmarathon-api.herokuapp.com/assets/sonya.gif',
+            name: player1JSO.name,
+            hp: player1JSO.hp,
+            img: player1JSO.img,
             weapon: ['axe', 'knife'],
             rootSelector:'arenas'
         });
         const player2=new Player({
             player: 2,
-            name: 'Scorpion',
-            hp: 100,
-            img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
+            name: enemyJSON.name,
+            hp: enemyJSON.hp,
+            img: enemyJSON.img,
             weapon: ['axe', 'knife'],
             rootSelector:'arenas'
         })
@@ -89,13 +91,13 @@ export class Game{
         /**
          * Добавляем listener на кнопку submit для игры
          */
-        $formFight.addEventListener('submit', function (e) {
+        $formFight.addEventListener('submit', async function (e) {
 
             e.preventDefault();
             console.dir($formFight);
-            const enemy = enemyAttack();
-            const attack = playerAttack();
-
+            const fight =await pve();
+            const enemy = fight.player2;
+            const attack =fight.player1;
 
             if (enemy.hit != attack.defence) {
                 player1.changeHP(enemy.value);
